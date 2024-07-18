@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: csrf-servlet
+  main:
+    banner-mode: off
+    web-application-type: servlet
+  lifecycle:
+    timeout-per-shutdown-phase: 10s
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/my-realm
+
+server:
+  shutdown: graceful
+
+management:
+  tracing:
+    enabled: true
+  endpoint:
+    health:
+      enabled: true
+      probes:
+        enabled: true
+      show-details: always
+    info:
+      enabled: true
+    loggers:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include:
+        - health
+        - info
+        - loggers
+        - metrics
+        - prometheus
+
+logging:
+  level:
+    it:
+      poli: debug
