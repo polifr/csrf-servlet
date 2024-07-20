@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.poli.csrf.model.health.HealthModel;
+import it.poli.csrf.model.loggers.LoggersDescriptorModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,5 +43,22 @@ public abstract class CsrfServletApplicationCommonTests {
 
     HealthModel health = objectMapper.readValue(jsonResponse, HealthModel.class);
     assertNotNull(health, "null health");
+  }
+
+  @Test
+  final void testLogsGetOk() throws Exception {
+    String jsonResponse =
+        mockMvc
+            .perform(get("/actuator/loggers"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    assertNotNull(jsonResponse, "null jsonResponse");
+
+    LoggersDescriptorModel loggersDescriptor =
+        objectMapper.readValue(jsonResponse, LoggersDescriptorModel.class);
+    assertNotNull(loggersDescriptor, "loggersDescriptor health");
   }
 }
