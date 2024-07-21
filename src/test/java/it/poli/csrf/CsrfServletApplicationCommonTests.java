@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.poli.csrf.model.health.HealthModel;
+import it.poli.csrf.model.loggers.LoggerLevelsDescriptorModel;
 import it.poli.csrf.model.loggers.LoggersDescriptorModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,5 +61,30 @@ public abstract class CsrfServletApplicationCommonTests {
     LoggersDescriptorModel loggersDescriptor =
         objectMapper.readValue(jsonResponse, LoggersDescriptorModel.class);
     assertNotNull(loggersDescriptor, "loggersDescriptor health");
+  }
+
+  @Test
+  final void testLogsGetLoggers() throws Exception {
+    LoggerLevelsDescriptorModel loggerLevelsDescriptor = this.getLoggerLevelsDescriptor("it.poli");
+    assertNotNull(loggerLevelsDescriptor.getConfiguredLevel(), "null configuredLevel");
+  }
+
+  protected LoggerLevelsDescriptorModel getLoggerLevelsDescriptor(String logger) throws Exception {
+    String jsonResponse =
+        mockMvc
+            .perform(get("/actuator/loggers"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    LoggersDescriptorModel loggersDescriptor =
+        objectMapper.readValue(jsonResponse, LoggersDescriptorModel.class);
+    assertNotNull(loggersDescriptor, "null loggersDescriptor");
+    assertNotNull(loggersDescriptor.getLoggers(), "null loggers");
+    LoggerLevelsDescriptorModel loggerLevelsDescriptor = loggersDescriptor.getLoggers().get(logger);
+    assertNotNull(loggerLevelsDescriptor, "null loggerLevelsDescriptor");
+
+    return loggerLevelsDescriptor;
   }
 }
