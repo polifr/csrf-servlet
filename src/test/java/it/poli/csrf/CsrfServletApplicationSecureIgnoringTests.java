@@ -2,6 +2,7 @@ package it.poli.csrf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import it.poli.csrf.configuration.CsrfIgnoringSecurityConfiguration;
 import it.poli.csrf.model.loggers.LoggerLevelsDescriptorModel;
@@ -20,8 +21,8 @@ class CsrfServletApplicationSecureIgnoringTests extends CsrfServletApplicationCo
 
   @ParameterizedTest
   @ValueSource(strings = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "OFF"})
-  final void testSetLoggerLevel(String level) throws Exception {
-    this.setLoggerLevel("it.poli", level);
+  final void testSetLoggerLevelOk(String level) throws Exception {
+    this.setLoggerLevel("it.poli", level).andExpect(status().is2xxSuccessful());
     LoggerLevelsDescriptorModel loggerLevelsDescriptor = this.getLoggerLevelsDescriptor("it.poli");
     assertNotNull(loggerLevelsDescriptor, "null loggerLevelsDescriptor");
     assertEquals(level, loggerLevelsDescriptor.getConfiguredLevel(), "incongruent logger lever");
