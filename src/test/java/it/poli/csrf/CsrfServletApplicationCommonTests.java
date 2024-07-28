@@ -1,8 +1,10 @@
 package it.poli.csrf;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -13,6 +15,7 @@ import it.poli.csrf.model.loggers.LoggersDescriptorModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -86,5 +89,32 @@ public abstract class CsrfServletApplicationCommonTests {
     assertNotNull(loggerLevelsDescriptor, "null loggerLevelsDescriptor");
 
     return loggerLevelsDescriptor;
+  }
+
+  protected void setLoggerLevel(String logger, String level) throws Exception {
+    LoggerLevelsDescriptorModel model =
+        LoggerLevelsDescriptorModel.builder().configuredLevel(level).build();
+    String content = objectMapper.writeValueAsString(model);
+    mockMvc
+        .perform(
+            post("/actuator/loggers/{logger}", logger)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+        .andDo(print())
+        .andExpect(status().is2xxSuccessful());
+  }
+
+  protected void setLoggerLevelWithCsrf(String logger, String level) throws Exception {
+    LoggerLevelsDescriptorModel model =
+        LoggerLevelsDescriptorModel.builder().configuredLevel(level).build();
+    String content = objectMapper.writeValueAsString(model);
+    mockMvc
+        .perform(
+            post("/actuator/loggers/{logger}", logger)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content)
+                .with(csrf()))
+        .andDo(print())
+        .andExpect(status().is2xxSuccessful());
   }
 }
