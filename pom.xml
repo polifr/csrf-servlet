@@ -15,7 +15,7 @@
   <description>Demo project for CSRF filtering in a servlet service</description>
 
   <properties>
-    <org.mapstruct.version>1.6.2</org.mapstruct.version>
+    <org.mapstruct.version>1.6.3</org.mapstruct.version>
   </properties>
 
   <dependencies>
